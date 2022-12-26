@@ -8,4 +8,3 @@ certifi~=2022.12.7
 requests~=2.28.1
 idna~=3.4
 urllib3~=1.26.13
-telebot~=0.0.4
