@@ -1,4 +1,4 @@
-from gpiozero import MotionSensor
+from gpiozero import LED, MotionSensor
 import cv2
 import telebot
 import time
@@ -36,10 +36,14 @@ def TelegramSendFile(input_file):
 
 def main():
     path = "images/"
-    # pir = MotionSensor(4)
+    pir = MotionSensor(4)
+    led = LED(17)
+    
     try:
         camera = cv2.VideoCapture(0)
         while True:
+            pir.when_motion
+            led.blink()
             current_Time = str(time.strftime("%Y%m%d-%H%M%S"))
 
             print("Motion detected! ", current_Time)
@@ -47,11 +51,11 @@ def main():
                 camera.open(0)
 
             result, image = camera.read()
-            # cv2.imwrite(path+current_Time+'.jpg', image)
             image_path = path + 'image' + '.jpg'
             cv2.imwrite(image_path, image)
             TelegramSendFile(image_path)
             camera.release()
+            pir.when_no_motion
 
     except Exception as e:
         print("Some error. ", e)
