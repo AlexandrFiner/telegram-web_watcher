@@ -1,12 +1,12 @@
-from gpiozero import LED, MotionSensor
+import OPi.GPIO as GPIO
 import cv2
 import telebot
 import time
 from threading import Thread
+from config import token
 
 user_list = []
 
-token = '5814884989:AAGzD3cRDpIc1bJhKMBFMuLSOmRPRSVSTKU'
 bot = telebot.TeleBot(token, parse_mode=None)
 
 
@@ -29,21 +29,20 @@ def add_to_list(message):
 
 
 def TelegramSendFile(input_file):
-    # Написать код отправки файла в Телеграмм: Матяж Владимир
     for chatId in user_list:
         bot.send_photo(chatId, open(input_file, 'rb'))
 
 
 def main():
     path = "images/"
-    pir = MotionSensor(4)
-    led = LED(17)
+    PORT = 5
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(PORT, GPIO.OUT)
+    GPIO.output(PORT, GPIO.HIGH)
     
     try:
-        camera = cv2.VideoCapture(0)
+        camera = cv2.VideoCapture(1)
         while True:
-            pir.when_motion
-            led.blink()
             current_Time = str(time.strftime("%Y%m%d-%H%M%S"))
 
             print("Motion detected! ", current_Time)
@@ -54,8 +53,10 @@ def main():
             image_path = path + 'image' + '.jpg'
             cv2.imwrite(image_path, image)
             TelegramSendFile(image_path)
-            camera.release()
-            pir.when_no_motion
+            
+            GPIO.OUTPUT(PORT, GPIO.LOW)
+            time.sleep(5)
+            GPIO.output(PORT, GPIO.HIGH)
 
     except Exception as e:
         print("Some error. ", e)
