@@ -39,27 +39,22 @@ def main():
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(PORT, GPIO.OUT)
     GPIO.output(PORT, GPIO.HIGH)
-    
-    try:
-        camera = cv2.VideoCapture(1)
-        while True:
-            current_Time = str(time.strftime("%Y%m%d-%H%M%S"))
 
-            print("Motion detected! ", current_Time)
-            if not camera.isOpened():
-                camera.open(0)
+    camera = cv2.VideoCapture(1)
+    while True:
+        current_Time = str(time.strftime("%Y%m%d-%H%M%S"))
 
-            result, image = camera.read()
-            image_path = path + 'image' + '.jpg'
-            cv2.imwrite(image_path, image)
-            TelegramSendFile(image_path)
-            
-            GPIO.OUTPUT(PORT, GPIO.LOW)
-            time.sleep(5)
-            GPIO.output(PORT, GPIO.HIGH)
+        print("Motion detected! ", current_Time)
+        if not camera.isOpened():
+            camera.open(0)
 
-    except Exception as e:
-        print("Some error. ", e)
+        result, image = camera.read()
+        cv2.imwrite(f"{path}image.jpg", image)
+        TelegramSendFile(f"{path}image.jpg")
+
+        GPIO.OUTPUT(PORT, GPIO.LOW)
+        time.sleep(5)
+        GPIO.output(PORT, GPIO.HIGH)
 
 
 if __name__ == "__main__":
